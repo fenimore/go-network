@@ -16,38 +16,34 @@ import (
 )
 
 const PORT = 3540
+var usernames map[int]string
 
 type Client struct {
-	handle string
+	username string
 	socketNumber int
-	socket net.Conn
+	client net.Conn
 
 }
 
 func (client *Client) List() {
-	fmt.Printf(client.handle)
+	fmt.Printf(client.username)
 }
 
 func main() {
-	//var usernames map[int]string
-	//Clients := make([]net.Conn, 10)
-	var clients []*Client
-	usernames := make(map[int]string)
 	server, err := net.Listen("tcp", ":"+strconv.Itoa(PORT))
 	if err != nil {
 		panic("couldn't start listening: ")
 	}
-	conns := acceptClients(server, usernames, clients)
+	conns := acceptClients(server)
 	for {
-		go acceptData(<-conns, usernames)
-		//fmt.Printf("%v", clients)
+		go acceptData(<-conns)
 
 	}
 }
 
 //make connection
 //accept new connections
-func acceptClients(listener net.Listener, usernames map[int]string, clients []*Client) chan net.Conn {
+func acceptClients(listener net.Listener) chan net.Conn {
 	ch := make(chan net.Conn)
 	//connections := make(chan Client)
 	i := 0
@@ -58,17 +54,14 @@ func acceptClients(listener net.Listener, usernames map[int]string, clients []*C
 				fmt.Printf("couldn't accept connection")
 				continue
 			}
-			username,_ :=  bufio.NewReader(client).ReadString('>')
-			c := Client{handle: username, socketNumber: 10, socket: client,}
-			clients = append(clients, &c)
-			fmt.Printf(username)
-			connKey, _ := strconv.Atoi(client.RemoteAddr().String()[9:11])
-			usernames[connKey] = username
-			// print all usernames????
-			
+			//username,_ :=  bufio.NewReader(client).ReadString('\n')
+			//sockNum := client.RemoteAddr.String()[9:11]
+			//username := "woosy"
+			//sockNum := 10
+			//c := Client{username: username, socketNumber: sockNum, client: client}
+			//print info of user
 			i++
 			fmt.Printf("%d: %v <-> %v\n", i, client.LocalAddr(), client.RemoteAddr())
-			fmt.Printf("%v",clients)
 			ch <- client
 		}
 	}()
@@ -78,18 +71,16 @@ func acceptClients(listener net.Listener, usernames map[int]string, clients []*C
 //broadcast message
 
 //forward message
-func acceptData(client net.Conn, usernames map[int]string) {
+func acceptData(client net.Conn) {
 	fmt.Print("\n")
 	for {
 		msg, _ := bufio.NewReader(client).ReadString('\n')// what does the \n do?
-		id, _ := strconv.Atoi(client.RemoteAddr().String()[9:11])
-		u, _ := usernames[id]
-		username := "<" + u
+		username := "<" + client.RemoteAddr().String()[9:11] + ">"
 		if msg == ""{
 			//fmt.Print(username, " leaves the chat")
 			client.Close() // doesn't work
 			continue
 		}
-		fmt.Print(username, " ", string(msg))
+		fmt.Print(username, string(msg))
 	}
 }
