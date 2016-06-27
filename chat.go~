@@ -1,0 +1,13 @@
+// chat server
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"net"
+)
+
+type ChatRoom struct {
+	handle string
+	socketNumber int
+	socket net.Conn

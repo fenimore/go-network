@@ -76,6 +76,10 @@ func acceptClients(listener net.Listener, usernames map[int]string, clients []*C
 }
 
 //broadcast message
+// Find access to all clients!??!?
+func broadCast(message string, client net.Conn){
+	client.Write([]byte(message + "\n"))
+}
 
 //forward message
 func acceptData(client net.Conn, usernames map[int]string) {
@@ -91,5 +95,6 @@ func acceptData(client net.Conn, usernames map[int]string) {
 			continue
 		}
 		fmt.Print(username, " ", string(msg))
+		broadCast(string(msg), client)
 	}
 }

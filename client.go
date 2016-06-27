@@ -1,21 +1,35 @@
 package main
 
-import "net"
-//import "bufio"
-import "fmt"
-import "bufio"
-import "os"
-//import "strconv"
-import "math/rand"
-import "time"
+import (
+	"net"
+	"fmt"
+	"bufio"
+	"os"
+	// "strconv"
+	"math/rand"
+	"time"
+)
 
 
 
 func sendData(client net.Conn){
+	go func() {
 		reader := bufio.NewReader(os.Stdin)
 		fmt.Print("> ")
 		msg, _ := reader.ReadString('\n')
 		client.Write([]byte(msg + "\n"))
+	}()
+}
+
+func receiveData(client net.Conn, data chan string) chan string{
+	go func(){
+		reader := bufio.NewReader(client)
+	// flush?
+		recv, _ := reader.ReadString('\n')
+		fmt.Print(recv)
+		data <- recv
+	}()
+	return data
 }
 
 
@@ -38,22 +52,15 @@ func main() {
 	var msg string
 	rand.Seed(int64(time.Now().Nanosecond()))
 	msg = names[rand.Intn(len(names))]
+	data := make(chan string)
 	//fmt.Println(conn, msg)
 	conn.Write([]byte(msg + ">"))
+	data = receiveData(conn, data)
+	fmt.Print(<-data)
 	//
 	for {
-		go sendData(conn)
+		sendData(conn)
+		incoming := receiveData(conn, data)
+		fmt.Print(<-incoming)
 	}
-	fmt.Print("Up and running")
-	//status, _ := bufio.NewReader(conn).readString('\n')
-	//for {
-	//	reader := bufio.NewReader(os.Stdin)
-	//	fmt.Print("Enter message : ")
-	//	fmt.Print(strconv.Itoa(len(names)))
-		//fmt.Println(strconv.Itoa(rand.Seed(23).Intn(len(names))))
-	//	msg, _ := reader.ReadString('\n')
-	//	conn.Write([]byte(msg + "\n"))
-		//echo, _ := bufio.NewReader(conn).ReadString('\n')
-		//fmt.Print(echo)
-	//}
 }
