@@ -13,23 +13,19 @@ import (
 
 
 func sendData(client net.Conn){
-	go func() {
 		reader := bufio.NewReader(os.Stdin)
 		fmt.Print("> ")
 		msg, _ := reader.ReadString('\n')
 		client.Write([]byte(msg + "\n"))
-	}()
 }
 
-func receiveData(client net.Conn, data chan string) chan string{
-	go func(){
-		reader := bufio.NewReader(client)
-	// flush?
+func receiveData(client net.Conn, data chan string){
+	reader := bufio.NewReader(client)
+	for {
 		recv, _ := reader.ReadString('\n')
 		fmt.Print(recv)
 		data <- recv
-	}()
-	return data
+	}
 }
 
 
@@ -55,12 +51,13 @@ func main() {
 	data := make(chan string)
 	//fmt.Println(conn, msg)
 	conn.Write([]byte(msg + ">"))
-	data = receiveData(conn, data)
+	go receiveData(conn, data)
 	fmt.Print(<-data)
 	//
 	for {
-		sendData(conn)
-		incoming := receiveData(conn, data)
-		fmt.Print(<-incoming)
+		data := make(chan string)
+		go sendData(conn)
+		go receiveData(conn, data)
+		fmt.Print(<-data)
 	}
 }
