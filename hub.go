@@ -1,4 +1,5 @@
 //http://synflood.at/tmp/golang-slides/mrmcd2012.html#9
+// http://stackoverflow.com/questions/38085356/golang-use-two-reader-returned-lines-for-select-statement
 package main
 
 import (
@@ -8,13 +9,12 @@ import (
 	"os"
 )
 
-
 type Client struct {
 	conn net.Conn
-	ch chan<- string
+	ch   chan<- string
 }
 
-func main(){
+func main() {
 	port := "8998"
 	listener, err := net.Listen("tcp", ":"+port)
 	if err != nil {
@@ -45,14 +45,15 @@ func main(){
 //Select from one of three channels:
 //New Clients, New Messages, or New Disconnects
 //Run in a goroutine
-func inCome(msgs <-chan string, conns <-chan Client, discs <-chan net.Conn){
+// the <-chan direction means that these values will be ready for a select
+func inCome(msgs <-chan string, conns <-chan Client, discs <-chan net.Conn) {
 	connections := make(map[net.Conn]chan<- string)
 	for {
 		select {
-		case msg := <- msgs:
+		case msg := <-msgs:
 			//print
 			for _, val := range connections {
-				go func(ch chan<- string){
+				go func(ch chan<- string) {
 					ch <- msg
 				}(val)
 			}
@@ -88,15 +89,15 @@ func outGo(conn net.Conn, msgs chan<- string,
 			if err != nil {
 				break
 			} // line is still sent to self
-			messages <- "<"+handle+"> "+string(line)
+			messages <- "<" + handle + "> " + string(line)
 		}
 		messages <- handle + " has left chat"
-	}()// end of go func
+	}() // end of go func
 Loop: // label loop for breaking out of it
 	for {
 		select {
 		case msg, ok := <-messages:
-			if !ok{
+			if !ok {
 				break Loop
 			}
 			msgs <- msg

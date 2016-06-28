@@ -1,9 +1,9 @@
 package main
 
 import (
-	"net"
-	"fmt"
 	"bufio"
+	"fmt"
+	"net"
 	"os"
 )
 
@@ -16,26 +16,26 @@ func main() {
 	for {
 		select {
 		case msg := <-outgoing:
-			fmt.Fprintf(conn, msg)// don't \n
+			fmt.Fprintf(conn, msg) // don't \n
 			break
 		case msg := <-incoming:
-			fmt.Print(msg)// the server sends \n
+			fmt.Print(msg) // the server sends \n
 			break
 		}
 	}
 }
 
-func checkOutgoing(outs chan<- string){
+func checkOutgoing(outs chan<- string) {
 	inputReader := bufio.NewReader(os.Stdin)
-	for{
+	for {
 		outgoing, _ := inputReader.ReadString('\n')
 		outs <- outgoing
 	}
 }
 
-func checkIncoming(conn net.Conn, ins chan<- string){
+func checkIncoming(conn net.Conn, ins chan<- string) {
 	connReader := bufio.NewReader(conn)
-	for{
+	for {
 		incoming, _ := connReader.ReadString('\n')
 		ins <- incoming
 	}
