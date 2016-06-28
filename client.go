@@ -5,59 +5,38 @@ import (
 	"fmt"
 	"bufio"
 	"os"
-	// "strconv"
-	"math/rand"
-	"time"
 )
 
-
-
-func sendData(client net.Conn){
-		reader := bufio.NewReader(os.Stdin)
-		fmt.Print("> ")
-		msg, _ := reader.ReadString('\n')
-		client.Write([]byte(msg + "\n"))
-}
-
-func receiveData(client net.Conn, data chan string){
-	reader := bufio.NewReader(client)
+func main() {
+	conn, _ := net.Dial("tcp", "localhost:8998")
+	outgoing := make(chan string)
+	incoming := make(chan string)
+	go checkIncoming(conn, incoming)
+	go checkOutgoing(outgoing)
 	for {
-		recv, _ := reader.ReadString('\n')
-		fmt.Print(recv)
-		data <- recv
+		select {
+		case msg := <-outgoing:
+			fmt.Fprintf(conn, msg)// don't \n
+			break
+		case msg := <-incoming:
+			fmt.Print(msg)// the server sends \n
+			break
+		}
 	}
 }
 
+func checkOutgoing(outs chan<- string){
+	inputReader := bufio.NewReader(os.Stdin)
+	for{
+		outgoing, _ := inputReader.ReadString('\n')
+		outs <- outgoing
+	}
+}
 
-
-func main() {
-	//names := []string{"alpha","beta","gamma",}
-	names:= make([]string, 0, 10)
-	names= append(names,
-		"alpha",
-		"beta",
-		"gamma",
-		"zeta",
-		"meta",
-		"greta",
-		"woops",
-		"frinzipat",
-		"calhou",
-	)
-	conn, _ := net.Dial("tcp", "localhost:3540")
-	var msg string
-	rand.Seed(int64(time.Now().Nanosecond()))
-	msg = names[rand.Intn(len(names))]
-	data := make(chan string)
-	//fmt.Println(conn, msg)
-	conn.Write([]byte(msg + ">"))
-	go receiveData(conn, data)
-	fmt.Print(<-data)
-	//
-	for {
-		data := make(chan string)
-		go sendData(conn)
-		go receiveData(conn, data)
-		fmt.Print(<-data)
+func checkIncoming(conn net.Conn, ins chan<- string){
+	connReader := bufio.NewReader(conn)
+	for{
+		incoming, _ := connReader.ReadString('\n')
+		ins <- incoming
 	}
 }

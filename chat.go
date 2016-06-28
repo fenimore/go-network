@@ -78,7 +78,7 @@ func (room *ChatRoom) acceptData(client net.Conn, in chan string){ // return out
 
 
 func (room *ChatRoom) echoData(out string){
-	message := out
+	message :=  out
 	for _, client := range room.clients {
 		client.Write([]byte("something has been sent\n"))
 		client.Write([]byte(message))

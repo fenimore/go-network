@@ -48,7 +48,7 @@ func handleConnection(c net.Conn, msgchan chan<- string, addchan chan<- Client, 
 
 		bufc := bufio.NewReader(c)
 
-		c.Write([]byte("\033[1;30;41mWelcome to the fancy demo chat!\033[0m\r\nWhat is your nick? "))
+		c.Write([]byte("\033[1;30;41mWelcome to the fancy demo chat!\033[0m\r\nWhat is your nick? \n"))
 		nick, _, err := bufc.ReadLine()
 		if err != nil {
 			return
@@ -56,9 +56,9 @@ func handleConnection(c net.Conn, msgchan chan<- string, addchan chan<- Client, 
 
 		nickname := string(nick)
 
-		c.Write([]byte("Welcome, " + nickname + "!\r\n\r\n"))
+		c.Write([]byte("Welcome, " + nickname + "!\r\n"))
 
-		msgs <- "New user " + nickname + " has joined the chat room."
+		msgs <- "New user " + nickname + " has joined the chat room.\n"
 
 		for {
 			line, _, err := bufc.ReadLine()

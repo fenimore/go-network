@@ -1,0 +1,40 @@
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"net"
+	"os"
+)
+
+
+type Client struct {
+	conn net.Conn
+	ch chan<- string
+}
+
+func main(){
+	port := "8998"
+	listener, err := net.Listen("tcp", ":"+port)
+	i err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	messages := make(chan string)
+	clients := make(chan Client)
+	disconnects := make(chan net.Conn)
+
+	// goroutine
+	go inCome(messages, clients, disconnects)
+
+	for {
+		// check if channel is ready
+		conn, err := listener.Accept()
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+
+		go outGo
+		
