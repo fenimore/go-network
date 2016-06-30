@@ -68,13 +68,14 @@ func inCome(msgs <-chan string, conns <-chan Client, discs <-chan net.Conn) {
 }
 
 //Outgoing messages.
+//put incoming messages into server
 func outGo(conn net.Conn, msgs chan<- string,
 	conns chan<- Client, discs chan<- net.Conn) {
+	
 	channel := make(chan string)
 	messages := make(chan string)
 	conns <- Client{conn, channel}
 
-	// as for username then
 	// read input from client and add to messages
 	go func() {
 		defer close(messages)
@@ -82,7 +83,7 @@ func outGo(conn net.Conn, msgs chan<- string,
 		conn.Write([]byte("What is your name?\n"))
 		nick, _, _ := bufc.ReadLine()
 		handle := string(nick)
-		conn.Write([]byte("Welcome!\n"))
+		conn.Write([]byte("Welcome "+ handle+"\n"))
 		messages <- handle + " has joined chat"
 		for {
 			line, _, err := bufc.ReadLine()

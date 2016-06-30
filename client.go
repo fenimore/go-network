@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net"
 	"os"
-	"regexp"
 )
 
 // Client
@@ -15,9 +14,9 @@ func main() {
 	
 	outgoing := make(chan string)
 	incoming := make(chan string)
-	var lastMessage string
-	go checkIncoming(conn, incoming, lastMessage)
-	go checkOutgoing(outgoing, &lastMessage)
+
+	go checkIncoming(conn, incoming)
+	go checkOutgoing(outgoing)
 	
 	for {
 		select {
@@ -34,7 +33,7 @@ func main() {
 }
 
 // Check for User input for outgoing channel
-func checkOutgoing(outs chan<- string, last *string) {
+func checkOutgoing(outs chan<- string) {
 	inputReader := bufio.NewReader(os.Stdin)
 	//var screen *bytes.Buffer = new(bytes.Buffer)
 	//var output *bufio.Writer = bufio.NewWriter(os.Stdout)
@@ -43,33 +42,33 @@ func checkOutgoing(outs chan<- string, last *string) {
 		if err != nil {
 			break
 		}
-		last = &outgoing
-		//outs <- outgoing
-		//output.WriteString("\033[2J")
-		//fmt.Fprintf(screen, "\033[%d;%dH", 1, 1)
 		outs <- outgoing
 	}
 }
 
 // Check for incoming from server
 func checkIncoming(conn net.Conn,
-	ins chan<- string, last string) {
+	ins chan<- string) {
 
 	connReader := bufio.NewReader(conn)
 
 	for {
 		incoming, _ := connReader.ReadString('\n')
-		matched, _ := regexp.MatchString(last, incoming)
-		if matched {
-			fmt.Print("itss a match")
-		}
 		ins <- incoming
 	}
 }
 
 
 func welcomeUser(){
-	welcomeMessage := "Welcome"
+	welcomeMessage := `
+    ___       ___       ___       ___   
+   /\  \     /\  \     /\__\     /\  \  
+  /::\  \   /::\  \   /:/__/_   /::\  \ 
+ /::\:\__\ /:/\:\__\ /::\/\__\ /:/\:\__\
+ \:\:\/  / \:\ \/__/ \/\::/  / \:\/:/  /
+  \:\/  /   \:\__\     /:/  /   \::/  / 
+   \/__/     \/__/     \/__/     \/__/  
+`
 	fmt.Println(welcomeMessage)
 }
 
