@@ -4,6 +4,7 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"io"
 	"net"
@@ -16,7 +17,16 @@ const BUFFERSIZE = 1024
 const PORT = 1337
 
 func main() {
-	conn, err := net.Dial("tcp", "localhost:"+strconv.Itoa(PORT))
+	// Doesn't seem to connect when I enter my internall addres? :S
+	fmt.Print("Enter internal IP (or leave blank for localhost): ")
+	inputReader := bufio.NewReader(os.Stdin)
+	IP, err := inputReader.ReadString('\n')
+	IP = strings.TrimRight(IP, "\r\n")
+	if IP == "" {
+		IP = "localhost"
+	}
+
+	conn, err := net.Dial("tcp", IP+":"+strconv.Itoa(PORT))
 	if err != nil {
 		panic(err)
 	}

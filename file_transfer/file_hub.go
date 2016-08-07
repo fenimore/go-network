@@ -16,9 +16,16 @@ const BUFFERSIZE = 1024 // About 1 KB at a time?
 const PORT = 1337
 
 func main() {
-
+	// Welcome
+	fmt.Println("\n\nReady to Transfer Files,")
+	// Get Internal IP
+	ifaces, err := net.Interfaces()
+	if err != nil {
+		fmt.Println(err)
+	}
+	addresses, _ := ifaces[2].Addrs()
+	address := addresses[0].String() // Trim the /24?
 	// Listen on Port
-
 	hub, err := net.Listen("tcp", "localhost:"+strconv.Itoa(PORT))
 	if err != nil {
 		fmt.Println("Error Listening: ", err)
@@ -26,7 +33,7 @@ func main() {
 	}
 
 	defer hub.Close()
-	fmt.Println("Listening on, " + strconv.Itoa(PORT))
+	fmt.Printf("Connect to (internal) Ip: %s and Port:%s\n", address, strconv.Itoa(PORT))
 
 	fmt.Print("Send file: ")
 	// Choose file to send
