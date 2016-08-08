@@ -14,11 +14,11 @@ import (
 )
 
 const BUFFERSIZE = 1024
-const PORT = 1337
+const PORT = 2335
 
 func main() {
 	// Doesn't seem to connect when I enter my internal addres? :S
-	fmt.Print("Enter internal IP (or leave blank for localhost): ")
+	fmt.Print("\n\nEnter internal IP [do not specify port]: ")
 	inputReader := bufio.NewReader(os.Stdin)
 	IP, err := inputReader.ReadString('\n')
 	IP = strings.TrimRight(IP, "\r\n")
@@ -32,8 +32,7 @@ func main() {
 	}
 	defer conn.Close()
 
-	fmt.Println("Connected, start receiving, " +
-		" first size then name then actual data")
+	fmt.Println("Connected to Hub")
 	// Buffer size Byte Slices Correspond to the info which
 	// will always be sent.
 	// Does this mean that the []byte size, however, is the same as
@@ -46,12 +45,13 @@ func main() {
 	// which will then be filled with the Connections incoming
 	// data.
 	conn.Read(bufferFileSize) // first read size
-	fmt.Printf("File size: %s\n", strings.Trim(string(bufferFileSize), ":"))
 	// Again, reading, this time, 64 bytes in...
 	fileSize, _ := strconv.ParseInt(strings.Trim(string(bufferFileSize), ":"), 10, 64)
 	conn.Read(bufferFileName)
 	fileName := strings.Trim(string(bufferFileName), ":")
-	fmt.Printf("File Name: %s\n", fileName)
+	// Print Some helpful reminders
+	fmt.Printf("    File Name: %s\n", fileName)
+	fmt.Printf("    File Size: %s bytes\n", strings.Trim(string(bufferFileSize), ":"))
 	// Create the file to write
 	file, err := os.Create(fileName)
 	if err != nil {
@@ -77,5 +77,5 @@ func main() {
 		// Increment Counter
 		totalRecv += BUFFERSIZE
 	}
-	fmt.Println("Received file")
+	fmt.Println("    Successful Transfer")
 }
