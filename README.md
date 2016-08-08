@@ -1,7 +1,8 @@
 Some things work
 
-Chat Server
+## Chat Server
 - can't get the user input to not appear in terminal...
 
 
-File Transfer
+## File Transfer
+- transfer files over internal network
