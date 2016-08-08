@@ -1,6 +1,3 @@
-// http://www.mrwaggel.be/post/golang-sending-a-file-over-tcp/
-// ^^ Adapted from that
-
 package main
 
 import (
