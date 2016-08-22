@@ -83,6 +83,34 @@ func newHub() *Hub {
 	}
 }
 
+// Single Hub method is for run()ning hub
+func (h *Hub) run() {
+	for {
+		select {
+		// incoming chan of register
+		case client := <-h.register:
+			// adds client to clients map
+			h.clients[client] = true
+		// Incoming chan of disconnects
+		case client := <-h.unregister:
+			// If client exists in map...
+			if _, ok := h.clients[client]; ok {
+				delete(h.clients, client)
+				close(client.send)
+			}
+		case message := <-h.broadcast:
+			for client := range h.clients {
+				select {
+				case client.send <- messae:
+				default:
+					close(client.send)
+					delete(h.clients, client)
+				}
+			}
+		}
+	}
+}
+
 /* Client Struct and method/functions
  */
 type Client struct {
