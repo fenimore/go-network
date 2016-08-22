@@ -1,12 +1,17 @@
 // Using go-gorilla websocket
 // And rewriting their example chat client/hub
+// Trying it in a single file for brevity sake
 package main
 
 import (
+	"bytes" // for Client
 	"flag"
 	"fmt"
 	"net/http"
 	"text/template"
+	"time" // for Client
+
+	"github.com/gorilla/websocket" // for Client
 )
 
 // What does flag.String do?
@@ -52,4 +57,30 @@ func main() {
 	}
 }
 
-/* Hub Struct and Functions */
+/* Hub Struct and Functions
+no imports? Uses Client Struct
+*/
+type Hub struct {
+	// Registered Clients
+	clients map[*Client]bool // true for is connected?
+	// Messages from Clients
+	// Messages are in bytes
+	broadcast chan []byte
+	// Register requests from Clients
+	// Takes Client struct
+	register chan *Client
+	// Unregister, disconnect Clients
+	unregister chan *Client
+}
+
+/* Client Struct and method/functions
+ */
+type Client struct {
+	hub *Hub // takes a hub duh
+	// Websocket Connection, keep track of...
+	conn *websocket.Conn
+	// Buffered channel of outbound messages
+	// In bytes, with 1 kb buffer?
+	send chan []byte
+	// What about incoming?
+}
