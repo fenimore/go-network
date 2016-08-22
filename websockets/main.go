@@ -73,6 +73,16 @@ type Hub struct {
 	unregister chan *Client
 }
 
+// Constructor for Hub
+func newHub() *Hub {
+	return &Hub{ // Return a pointer to new Hub
+		broadcast:  make(chan []byte),
+		register:   make(chan *Client),
+		clients:    make(map[*Client]bool),
+		unregister: make(chan *Client),
+	}
+}
+
 /* Client Struct and method/functions
  */
 type Client struct {
@@ -83,4 +93,5 @@ type Client struct {
 	// In bytes, with 1 kb buffer?
 	send chan []byte
 	// What about incoming?
+	// No constructor, rather constructed from Hub?
 }
