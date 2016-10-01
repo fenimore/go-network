@@ -183,6 +183,8 @@ func (c *Client) writePump() {
 			}
 			w.Write(message)
 			// TOo tired to continue
+		}
+	}
 			
 }
 // writePump pumps messages from the hub to the connection
