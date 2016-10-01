@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net"
 	"strings"
+	"time"
 
 	portscanner "github.com/anvie/port-scanner"
 )
@@ -13,15 +14,17 @@ import (
 func main() {
 	// find subnet
 	a, _ := LocalAddress()
-	fmt.Println(a)
-	addrs, _ := ListAddresses()
-	fmt.Println(addrs)
 
+	addrs, _ := ListAddresses()
+	fmt.Println("Addresses:\n", addrs)
 	ifaces, _ := net.Interfaces()
-	fmt.Println(ifaces)
+	fmt.Println("Interfaces:\n", ifaces)
+	fmt.Println("Me:\n", a.String(), ifaces[2])
 	local := strings.TrimRight(a.String(), "/24")
 	fmt.Println(local)
-	ps := portscanner.NewPortScanner("localhost", 100000)
+	//localhost := "localhost"
+	//actual := "192.168.1.140"
+	ps := portscanner.NewPortScanner(local, 10*time.Second)
 	openedPorts := ps.GetOpenedPort(20, 30000)
 	fmt.Println(openedPorts)
 	for i := 0; i < len(openedPorts); i++ {
