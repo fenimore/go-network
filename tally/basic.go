@@ -5,6 +5,9 @@ package main
 import (
 	"fmt"
 	"net"
+	"strings"
+
+	portscanner "github.com/anvie/port-scanner"
 )
 
 func main() {
@@ -16,6 +19,16 @@ func main() {
 
 	ifaces, _ := net.Interfaces()
 	fmt.Println(ifaces)
+	local := strings.TrimRight(a.String(), "/24")
+	fmt.Println(local)
+	ps := portscanner.NewPortScanner("localhost", 100000)
+	openedPorts := ps.GetOpenedPort(20, 30000)
+	fmt.Println(openedPorts)
+	for i := 0; i < len(openedPorts); i++ {
+		port := openedPorts[i]
+		fmt.Print(" ", port, " [open]")
+		fmt.Println("  -->  ", ps.DescribePort(port))
+	}
 }
 
 // LocalAddress returns local addr.
