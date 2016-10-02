@@ -21,9 +21,12 @@ func main() {
 	fmt.Println("Interfaces:\n", ifaces)
 	fmt.Println("Me:\n", a.String(), ifaces[2])
 	local := strings.TrimRight(a.String(), "/24")
-	fmt.Println(local)
-	//localhost := "localhost"
 	//actual := "192.168.1.140"
+	//fmt.Println(local)
+	//fmt.Println(actual)
+	//localhost := "localhost"
+
+	// Scanner
 	ps := portscanner.NewPortScanner(local, 10*time.Second)
 	openedPorts := ps.GetOpenedPort(20, 30000)
 	fmt.Println(openedPorts)
